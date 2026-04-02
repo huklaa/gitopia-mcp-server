@@ -1,0 +1,19 @@
+{
+  "workspace": {
+    "base_path": "~/.mcp/gitopia/workspace",
+    "auto_cleanup": true,
+    "max_age_days": 7
+  },
+  "git": {
+    "default_user_name": "Your Name",
+    "default_user_email": "your.email@example.com"
+  },
+  "logging": {
+    "level": "info",
+    "format": "json"
+  },
+  "gitopia": {
+    "grpc_endpoint": "gitopia-grpc.polkachu.com:11390",
+    "timeout_seconds": 30
+  }
+}

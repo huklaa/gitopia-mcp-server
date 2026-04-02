@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+prd.md
+
+# Development files
+.env
+.env.local
+.env.example
+workspace/
+*.log
+
+# Build artifacts
+gitopia-mcp-server
+dist/
+build/
+
+# Dependencies (will be downloaded in container)
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*_test.go
+test/
+
+# Docker files (except Dockerfile)
+docker-compose*.yml
+.dockerignore
+
+# GitHub
+.github/
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,10 @@
+version: "2"
+linters:
+  default: standard
+  settings:
+    staticcheck:
+      checks:
+        - "all"
+        - "-SA1019" # grpc.DialContext deprecated but required by Cosmos SDK
+        - "-ST1000" # package comments — not enforced for this project
+        - "-ST1003" # naming conventions (ownerId vs ownerID) — existing API surface, not changing
