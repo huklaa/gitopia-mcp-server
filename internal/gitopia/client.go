@@ -170,6 +170,25 @@ func (c *Client) GetUserByAddress(ctx context.Context, address string) (*User, e
 	}, nil
 }
 
+// GetUserByUsername queries a user by username and returns their address.
+func (c *Client) GetUserByUsername(ctx context.Context, username string) (*User, error) {
+	q := gitopiatypes.NewQueryClient(c.conn)
+	resp, err := q.User(ctx, &gitopiatypes.QueryGetUserRequest{
+		Id: username,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to query user '%s': %w", username, err)
+	}
+	if resp.User == nil {
+		return nil, fmt.Errorf("user not found: %s", username)
+	}
+	return &User{
+		ID:       strconv.FormatUint(resp.User.Id, 10),
+		Username: resp.User.Username,
+		Address:  resp.User.Creator,
+	}, nil
+}
+
 // GetUserDAOs queries DAOs that a user is a member of
 func (c *Client) GetUserDAOs(ctx context.Context, username string) ([]DAO, error) {
 	q := gitopiatypes.NewQueryClient(c.conn)

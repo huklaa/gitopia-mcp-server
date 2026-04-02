@@ -13,6 +13,25 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
+// resolveAssignees converts a list of usernames or addresses to bech32 addresses.
+// If a value is already a bech32 address (starts with "gitopia1"), it's kept as-is.
+// Otherwise it's treated as a username and resolved via the chain.
+func (h *ToolHandler) resolveAssignees(ctx context.Context, assignees []string) ([]string, error) {
+	resolved := make([]string, 0, len(assignees))
+	for _, a := range assignees {
+		if strings.HasPrefix(a, "gitopia1") {
+			resolved = append(resolved, a)
+			continue
+		}
+		user, err := h.GClient.GetUserByUsername(ctx, a)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve assignee '%s': %s", a, err)
+		}
+		resolved = append(resolved, user.Address)
+	}
+	return resolved, nil
+}
+
 // ---- Gitopia API Handlers ----
 
 type ListReposParams struct {
@@ -366,12 +385,20 @@ func (h *ToolHandler) UpdateIssue(
 	}
 
 	if len(p.AddAssignees) > 0 {
-		msgs = append(msgs, gitopiatypes.NewMsgAddIssueAssignees(w.Address(), repo.Id, p.IssueIid, p.AddAssignees))
+		resolved, resolveErr := h.resolveAssignees(ctx, p.AddAssignees)
+		if resolveErr != nil {
+			return toolErrorf(ErrValidation, "%s", resolveErr)
+		}
+		msgs = append(msgs, gitopiatypes.NewMsgAddIssueAssignees(w.Address(), repo.Id, p.IssueIid, resolved))
 		actions = append(actions, fmt.Sprintf("added %d assignees", len(p.AddAssignees)))
 	}
 
 	if len(p.RemoveAssignees) > 0 {
-		msgs = append(msgs, gitopiatypes.NewMsgRemoveIssueAssignees(w.Address(), repo.Id, p.IssueIid, p.RemoveAssignees))
+		resolved, resolveErr := h.resolveAssignees(ctx, p.RemoveAssignees)
+		if resolveErr != nil {
+			return toolErrorf(ErrValidation, "%s", resolveErr)
+		}
+		msgs = append(msgs, gitopiatypes.NewMsgRemoveIssueAssignees(w.Address(), repo.Id, p.IssueIid, resolved))
 		actions = append(actions, fmt.Sprintf("removed %d assignees", len(p.RemoveAssignees)))
 	}
 
@@ -651,9 +678,17 @@ func (h *ToolHandler) CreatePullRequest(
 	if err != nil {
 		return toolErrorf(ErrAuthFailed, "Authentication failed: %s", err)
 	}
+	// Resolve usernames to bech32 addresses if needed
+	assignees := p.Assignees
+	if len(assignees) > 0 {
+		assignees, err = h.resolveAssignees(ctx, assignees)
+		if err != nil {
+			return toolErrorf(ErrValidation, "%s", err)
+		}
+	}
 	start := time.Now()
 	prNumber, err := retryOnSequenceMismatch(func() (int, error) {
-		return h.GClient.CreatePullRequest(ctx, w, p.Owner, p.Name, p.Title, p.Description, p.HeadBranch, p.BaseBranch, p.Assignees, p.Labels, p.IssueIids)
+		return h.GClient.CreatePullRequest(ctx, w, p.Owner, p.Name, p.Title, p.Description, p.HeadBranch, p.BaseBranch, assignees, p.Labels, p.IssueIids)
 	})
 	AuditLog("create_pull_request", w.Address(), err == nil, time.Since(start), "")
 	if err != nil {
