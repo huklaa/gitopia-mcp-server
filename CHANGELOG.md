@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-04-02
+
+### Fixed
+- `create_repo` failed with "owner id must consist minimum 3 chars" when active DAO was set — `GetOwnerID` returned the numeric group ID instead of the DAO name (#1)
+- `create_pull_request` and `update_issue` assignees only accepted bech32 addresses — now resolves usernames to addresses automatically (#3)
+
 ## [0.1.0] - 2026-04-02
 
 First public release. 57 tools, 3 prompts, 4 resource templates.
