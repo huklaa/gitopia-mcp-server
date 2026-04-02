@@ -106,7 +106,7 @@ func (cm *ContextManager) GetOwnerID() string {
 	}
 
 	if cm.context.ActiveDAO != nil {
-		return cm.context.ActiveDAO.ID
+		return cm.context.ActiveDAO.Name
 	}
 
 	return cm.context.Username

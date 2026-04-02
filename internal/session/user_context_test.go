@@ -54,7 +54,7 @@ func TestGetOwnerID_WithActiveDAO(t *testing.T) {
 		DAOs:      []DAO{dao},
 		ActiveDAO: &dao,
 	})
-	assert.Equal(t, "dao-123", cm.GetOwnerID())
+	assert.Equal(t, "myorg", cm.GetOwnerID())
 }
 
 func TestGetUsername_NilContext(t *testing.T) {
