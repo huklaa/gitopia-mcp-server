@@ -50,3 +50,20 @@ changelog:
 release:
   draft: false
   prerelease: auto
+
+mcp:
+  name: io.github.gitopia/gitopia-mcp-server
+  title: "Gitopia MCP Server"
+  description: "Decentralized Git with on-chain governance, bounties, and DAOs. Tools for repos, issues, PRs, labels, releases, bounties, and DAO proposals. Auto-wallet on first use, trust tiers, and approval mode for human-in-the-loop."
+  homepage: "https://gitopia.com"
+  auth:
+    type: github-oidc
+  repository:
+    url: "https://github.com/gitopia/gitopia-mcp-server"
+    source: github
+    id: "1199353361"
+  packages:
+    - registry_type: oci
+      identifier: "ghcr.io/gitopia/gitopia-mcp-server:{{ .Version }}"
+      transport:
+        type: stdio

@@ -12,9 +12,11 @@ env:
 permissions:
   contents: write
   packages: write
+  id-token: write
 
 jobs:
   goreleaser:
+    needs: [docker]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -61,6 +63,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest
+          labels: |
+            io.modelcontextprotocol.server.name=io.github.gitopia/gitopia-mcp-server
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
