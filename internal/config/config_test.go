@@ -118,6 +118,24 @@ func TestLoadConfigFromEnv_ApprovalMode_False(t *testing.T) {
 	assert.False(t, cfg.ApprovalMode)
 }
 
+func TestLoadConfigFromEnv_BooleanOverridesCanDisableFileValues(t *testing.T) {
+	tmpDir := t.TempDir()
+	cfgPath := filepath.Join(tmpDir, "config.json")
+	require.NoError(t, os.WriteFile(cfgPath, []byte(`{
+		"dry_run": true,
+		"approval_mode": true
+	}`), 0644))
+
+	t.Setenv("MCP_CONFIG_FILE", cfgPath)
+	t.Setenv("DRY_RUN", "false")
+	t.Setenv("APPROVAL_MODE", "false")
+
+	cfg, err := LoadConfigFromEnv()
+	require.NoError(t, err)
+	assert.False(t, cfg.DryRun)
+	assert.False(t, cfg.ApprovalMode)
+}
+
 func TestLoadConfigFromEnv_ApprovalTTL(t *testing.T) {
 	t.Setenv("APPROVAL_TTL", "10m")
 	cfg, err := LoadConfigFromEnv()

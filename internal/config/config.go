@@ -137,8 +137,8 @@ func LoadConfigFromEnv() (*Config, error) {
         config.TrustLevel = trustLevel
     }
 
-    if dryRun := os.Getenv("DRY_RUN"); dryRun == "true" || dryRun == "1" {
-        config.DryRun = true
+    if dryRun, ok := os.LookupEnv("DRY_RUN"); ok {
+        config.DryRun = dryRun == "true" || dryRun == "1"
     }
 
     if endpoints := os.Getenv("GITOPIA_GRPC_ENDPOINTS"); endpoints != "" {
@@ -156,8 +156,8 @@ func LoadConfigFromEnv() (*Config, error) {
         config.HTTPPort = port
     }
 
-    if v := os.Getenv("APPROVAL_MODE"); v == "true" || v == "1" {
-        config.ApprovalMode = true
+    if v, ok := os.LookupEnv("APPROVAL_MODE"); ok {
+        config.ApprovalMode = v == "true" || v == "1"
     }
 
     if v := os.Getenv("APPROVAL_TTL"); v != "" {
